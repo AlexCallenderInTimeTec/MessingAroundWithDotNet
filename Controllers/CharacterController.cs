@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MessingAroundWithDotNet.Models;
+using MessingAroundWithDotNet.Services.CharacterService;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MessingAroundWithDotNet.Controllers
@@ -12,33 +13,32 @@ namespace MessingAroundWithDotNet.Controllers
     public class CharacterController : ControllerBase
     {
 
-        private List<Character> Characters = new List<Character>
+        private readonly ICharacterService _characterService;
+
+
+        public CharacterController(ICharacterService characterService)
         {
-            new Character(),
-            new Character
-            {
-                Id = 1,
-                Name = "Alex"
-            }
-        };
+            _characterService = characterService;
+        }
+
 
         [HttpGet("GetAll")]
-        public ActionResult<List<Character>> Get()
+        public async Task<ActionResult<List<Character>>> Get()
         {
-            return Ok(Characters);
+            return Ok(await _characterService.GetAllCharacters());
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Character> GetSingle(int id)
+        public async Task<ActionResult<Character>> GetSingle(int id)
         {
-            return Ok(Characters.FirstOrDefault(x => x.Id == id));
+            return Ok(await _characterService.GetCharacterById(id));
         }
 
         [HttpPost]
-        public ActionResult<Character> AddCharacter(Character newCharacter)
+        public async Task<ActionResult<Character>> AddCharacter(Character newCharacter)
         {
-            Characters.Add(newCharacter);
-            return Ok(Characters);
+            //Characters.Add(newCharacter);
+            return Ok(await _characterService.AddCharacter(newCharacter));
         }
     }
 }
