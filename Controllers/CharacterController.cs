@@ -11,12 +11,28 @@ namespace MessingAroundWithDotNet.Controllers
     [Route("api/[controller]")]
     public class CharacterController : ControllerBase
     {
-        private static Character Zombie = new Character();
 
-        [HttpGet]
-        public ActionResult<Character> Get()
+        private List<Character> Characters = new List<Character>
         {
-            return Ok(Zombie);
+            new Character(),
+            new Character
+            {
+                Id = 1,
+                Name = "Alex"
+            }
+
+        };
+
+        [HttpGet("GetAll")]
+        public ActionResult<List<Character>> Get()
+        {
+            return Ok(Characters);
+        }
+
+        [HttpGet("{id}")]
+        public ActionResult<Character> GetSingle(int id)
+        {
+            return Ok(Characters.FirstOrDefault(x => x.Id == id));
         }
     
     }
