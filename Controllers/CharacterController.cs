@@ -20,7 +20,6 @@ namespace MessingAroundWithDotNet.Controllers
                 Id = 1,
                 Name = "Alex"
             }
-
         };
 
         [HttpGet("GetAll")]
@@ -34,7 +33,12 @@ namespace MessingAroundWithDotNet.Controllers
         {
             return Ok(Characters.FirstOrDefault(x => x.Id == id));
         }
-    
-    }
 
+        [HttpPost]
+        public ActionResult<Character> AddCharacter(Character newCharacter)
+        {
+            Characters.Add(newCharacter);
+            return Ok(Characters);
+        }
+    }
 }
