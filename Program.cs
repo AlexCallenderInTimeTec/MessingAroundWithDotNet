@@ -1,5 +1,3 @@
-
-
 using MessingAroundWithDotNet.Services.CharacterService;
 
 var builder = WebApplication.CreateBuilder(args);

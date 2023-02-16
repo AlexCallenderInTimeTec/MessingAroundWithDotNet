@@ -8,7 +8,7 @@ namespace MessingAroundWithDotNet.Services.CharacterService
 {
     public class CharacterService : ICharacterService
     {
-        private List<Character> Characters = new List<Character>
+        private List<Character> characters = new List<Character>
         {
             new Character(),
             new Character
@@ -18,23 +18,27 @@ namespace MessingAroundWithDotNet.Services.CharacterService
             }
         };
 
-        public async Task<List<Character>> AddCharacter(Character newCharacter)
+        public async Task<ServiceResponse<List<Character>>> AddCharacter(Character newCharacter)
         {
-            Characters.Add(newCharacter);
-            return Characters;
+            var serviceResponse = new ServiceResponse<List<Character>>();
+            characters.Add(newCharacter);
+            serviceResponse.Data = characters;
+            return serviceResponse;
         }
 
-        public async Task<List<Character>> GetAllCharacters()
+        public async Task<ServiceResponse<List<Character>>> GetAllCharacters()
         {
-            return Characters;
+            var serviceResponse = new ServiceResponse<List<Character>>();
+            serviceResponse.Data = characters;
+            return serviceResponse;
         }
 
-        public async Task<Character> GetCharacterById(int id)
+        public async Task<ServiceResponse<Character>> GetCharacterById(int id)
         {
-            var character = Characters.FirstOrDefault(x => x.Id == id);
-            if (character != null)
-                return character;  
-            throw new Exception("Character Not Found"); 
+            var serviceResponse = new ServiceResponse<Character>();
+            var character = characters.FirstOrDefault(x => x.Id == id);
+            serviceResponse.Data = character;
+            return serviceResponse;
         }
     }
 }
