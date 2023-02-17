@@ -38,8 +38,18 @@ namespace MessingAroundWithDotNet.Controllers
         [HttpPost]
         public async Task<ActionResult<ServiceResponse<GetCharacterDataTransferObjects>>> AddCharacter(AddCharacterDataTransferObjects newCharacter)
         {
-            //Characters.Add(newCharacter);
             return Ok(await _characterService.AddCharacter(newCharacter));
+        }
+
+        [HttpPut]
+        public async Task<ActionResult<ServiceResponse<List<GetCharacterDataTransferObjects>>>> UpdateCharacter(UpdateCharacterDataTransferObjects updatedCharacter)
+        {
+            var respone = await _characterService.UpdateCharacter(updatedCharacter);
+            if (respone.Data == null){
+                return NotFound(respone);
+            }
+
+            return Ok(respone);
         }
     }
 }

@@ -10,8 +10,7 @@ namespace MessingAroundWithDotNet.Services.CharacterService
 {
     public class CharacterService : ICharacterService
     {
-        private readonly IMapper _mapper;
-        private List<Character> characters = new List<Character>
+        private static List<Character> characters = new List<Character>
         {
             new Character(),
             new Character
@@ -20,6 +19,7 @@ namespace MessingAroundWithDotNet.Services.CharacterService
                 Name = "Alex"
             }
         };
+        private readonly IMapper _mapper;
 
         public CharacterService(IMapper mapper)
         {
@@ -48,6 +48,36 @@ namespace MessingAroundWithDotNet.Services.CharacterService
             var serviceResponse = new ServiceResponse<GetCharacterDataTransferObjects>();
             var character = characters.FirstOrDefault(x => x.Id == id);
             serviceResponse.Data = _mapper.Map<GetCharacterDataTransferObjects>(character);
+            return serviceResponse;
+        }
+
+        public async Task<ServiceResponse<GetCharacterDataTransferObjects>> UpdateCharacter(UpdateCharacterDataTransferObjects updatedCharacter)
+        {
+            var serviceResponse = new ServiceResponse<GetCharacterDataTransferObjects>();
+
+            try
+            {
+                var character = characters.FirstOrDefault(c => c.Id == updatedCharacter.Id);
+                if (character == null)
+                    throw new Exception($"Charter with Id '{updatedCharacter.Id}' not found.");
+
+                _mapper.Map(updatedCharacter, character);    
+
+                character.Name = updatedCharacter.Name;
+                character.HitPoints = updatedCharacter.HitPoints;
+                character.Strength = updatedCharacter.Strength;
+                character.Defense = updatedCharacter.Defense;
+                character.Intelligence = updatedCharacter.Intelligence;
+                character.Class = updatedCharacter.Class;
+
+                serviceResponse.Data = _mapper.Map<GetCharacterDataTransferObjects>(character);
+
+            }
+            catch (Exception e)
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = e.Message;
+            }
             return serviceResponse;
         }
     }
