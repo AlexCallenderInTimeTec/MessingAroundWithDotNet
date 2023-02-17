@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MessingAroundWithDotNet.DataTransferObjects.Character;
 using MessingAroundWithDotNet.Models;
 using MessingAroundWithDotNet.Services.CharacterService;
 using Microsoft.AspNetCore.Mvc;
@@ -23,19 +24,19 @@ namespace MessingAroundWithDotNet.Controllers
 
 
         [HttpGet("GetAll")]
-        public async Task<ActionResult<ServiceResponse<List<Character>>>> Get()
+        public async Task<ActionResult<ServiceResponse<List<GetCharacterDataTransferObjects>>>> Get()
         {
             return Ok(await _characterService.GetAllCharacters());
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<ServiceResponse<Character>>> GetSingle(int id)
+        public async Task<ActionResult<ServiceResponse<GetCharacterDataTransferObjects>>> GetSingle(int id)
         {
             return Ok(await _characterService.GetCharacterById(id));
         }
 
         [HttpPost]
-        public async Task<ActionResult<ServiceResponse<Character>>> AddCharacter(Character newCharacter)
+        public async Task<ActionResult<ServiceResponse<GetCharacterDataTransferObjects>>> AddCharacter(AddCharacterDataTransferObjects newCharacter)
         {
             //Characters.Add(newCharacter);
             return Ok(await _characterService.AddCharacter(newCharacter));

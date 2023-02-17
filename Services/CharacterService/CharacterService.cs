@@ -2,12 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using MessingAroundWithDotNet.DataTransferObjects.Character;
 using MessingAroundWithDotNet.Models;
 
 namespace MessingAroundWithDotNet.Services.CharacterService
 {
     public class CharacterService : ICharacterService
     {
+        private readonly IMapper _mapper;
         private List<Character> characters = new List<Character>
         {
             new Character(),
@@ -18,26 +21,31 @@ namespace MessingAroundWithDotNet.Services.CharacterService
             }
         };
 
-        public async Task<ServiceResponse<List<Character>>> AddCharacter(Character newCharacter)
+        public CharacterService(IMapper mapper)
         {
-            var serviceResponse = new ServiceResponse<List<Character>>();
-            characters.Add(newCharacter);
-            serviceResponse.Data = characters;
+            _mapper = mapper;
+        }
+
+        public async Task<ServiceResponse<List<GetCharacterDataTransferObjects>>> AddCharacter(AddCharacterDataTransferObjects newCharacter)
+        {
+            var serviceResponse = new ServiceResponse<List<GetCharacterDataTransferObjects>>();
+            characters.Add(_mapper.Map<Character>(newCharacter));
+            serviceResponse.Data = characters.Select(c => _mapper.Map<GetCharacterDataTransferObjects>(c)).ToList();
             return serviceResponse;
         }
 
-        public async Task<ServiceResponse<List<Character>>> GetAllCharacters()
+        public async Task<ServiceResponse<List<GetCharacterDataTransferObjects>>> GetAllCharacters()
         {
-            var serviceResponse = new ServiceResponse<List<Character>>();
-            serviceResponse.Data = characters;
+            var serviceResponse = new ServiceResponse<List<GetCharacterDataTransferObjects>>();
+            serviceResponse.Data = characters.Select(c => _mapper.Map<GetCharacterDataTransferObjects>(c)).ToList();
             return serviceResponse;
         }
 
-        public async Task<ServiceResponse<Character>> GetCharacterById(int id)
+        public async Task<ServiceResponse<GetCharacterDataTransferObjects>> GetCharacterById(int id)
         {
-            var serviceResponse = new ServiceResponse<Character>();
+            var serviceResponse = new ServiceResponse<GetCharacterDataTransferObjects>();
             var character = characters.FirstOrDefault(x => x.Id == id);
-            serviceResponse.Data = character;
+            serviceResponse.Data = _mapper.Map<GetCharacterDataTransferObjects>(character);
             return serviceResponse;
         }
     }
