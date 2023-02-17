@@ -8,5 +8,6 @@ namespace MessingAroundWithDotNet.Services.CharacterService
         Task<ServiceResponse<List<GetCharacterDataTransferObjects>>> GetAllCharacters();
         Task<ServiceResponse<GetCharacterDataTransferObjects>> GetCharacterById(int id);
         Task<ServiceResponse<List<GetCharacterDataTransferObjects>>> AddCharacter(AddCharacterDataTransferObjects newCharacter);
+        Task<ServiceResponse<GetCharacterDataTransferObjects>> UpdateCharacter(UpdateCharacterDataTransferObjects updatedCharacter);
     }
 }
