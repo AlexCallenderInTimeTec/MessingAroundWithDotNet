@@ -36,6 +36,29 @@ namespace MessingAroundWithDotNet.Services.CharacterService
             return serviceResponse;
         }
 
+        public async Task<ServiceResponse<List<GetCharacterDataTransferObjects>>> DeleteCharacter(int id)
+        {
+             var serviceResponse = new ServiceResponse<List<GetCharacterDataTransferObjects>>();
+
+            try
+            {
+                var character = characters.FirstOrDefault(c => c.Id == id);
+                if (character == null)
+                    throw new Exception($"Character with Id '{id}' not found.");
+
+                characters.Remove(character);
+
+                serviceResponse.Data = characters.Select(c => _mapper.Map<GetCharacterDataTransferObjects>(c)).ToList();
+
+            }
+            catch (Exception e)
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = e.Message;
+            }
+            return serviceResponse;
+        }
+
         public async Task<ServiceResponse<List<GetCharacterDataTransferObjects>>> GetAllCharacters()
         {
             var serviceResponse = new ServiceResponse<List<GetCharacterDataTransferObjects>>();
@@ -61,7 +84,7 @@ namespace MessingAroundWithDotNet.Services.CharacterService
                 if (character == null)
                     throw new Exception($"Charter with Id '{updatedCharacter.Id}' not found.");
 
-                _mapper.Map(updatedCharacter, character);    
+                // _mapper.Map(updatedCharacter, character);    
 
                 character.Name = updatedCharacter.Name;
                 character.HitPoints = updatedCharacter.HitPoints;

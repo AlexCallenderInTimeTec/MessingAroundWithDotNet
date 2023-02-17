@@ -14,7 +14,7 @@ namespace MessingAroundWithDotNet
         {
             CreateMap<Character, GetCharacterDataTransferObjects>();
             CreateMap<AddCharacterDataTransferObjects, Character>();
-            CreateMap<UpdateCharacterDataTransferObjects, Character>();
+            // CreateMap<UpdateCharacterDataTransferObjects, Character>();
         }
     }
 }

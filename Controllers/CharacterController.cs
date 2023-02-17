@@ -51,5 +51,16 @@ namespace MessingAroundWithDotNet.Controllers
 
             return Ok(respone);
         }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<ServiceResponse<GetCharacterDataTransferObjects>>> DeleteCharacter(int id)
+        {
+            var respone = await _characterService.DeleteCharacter(id);
+            if (respone.Data == null){
+                return NotFound(respone);
+            }
+
+            return Ok(respone);
+        }
     }
 }
