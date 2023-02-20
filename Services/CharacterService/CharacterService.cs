@@ -60,10 +60,10 @@ namespace MessingAroundWithDotNet.Services.CharacterService
             return serviceResponse;
         }
 
-        public async Task<ServiceResponse<List<GetCharacterDataTransferObjects>>> GetAllCharacters()
+        public async Task<ServiceResponse<List<GetCharacterDataTransferObjects>>> GetAllCharacters(int userId)
         {
             var serviceResponse = new ServiceResponse<List<GetCharacterDataTransferObjects>>();
-            var dbCharacters = await _context.Characters.ToListAsync();
+            var dbCharacters = await _context.Characters.Where(c => c.User!.Id == userId).ToListAsync();
             serviceResponse.Data = dbCharacters.Select(c => _mapper.Map<GetCharacterDataTransferObjects>(c)).ToList();
             return serviceResponse;
         }
