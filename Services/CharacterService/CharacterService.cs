@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using MessingAroundWithDotNet.Data;
 using MessingAroundWithDotNet.DataTransferObjects.Character;
 using MessingAroundWithDotNet.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace MessingAroundWithDotNet.Services.CharacterService
 {
@@ -20,10 +22,13 @@ namespace MessingAroundWithDotNet.Services.CharacterService
             }
         };
         private readonly IMapper _mapper;
+        private readonly DataContext _context;
 
-        public CharacterService(IMapper mapper)
+        public CharacterService(IMapper mapper, DataContext context)
         {
+            _context = context;
             _mapper = mapper;
+            
         }
 
         public async Task<ServiceResponse<List<GetCharacterDataTransferObjects>>> AddCharacter(AddCharacterDataTransferObjects newCharacter)
@@ -62,15 +67,16 @@ namespace MessingAroundWithDotNet.Services.CharacterService
         public async Task<ServiceResponse<List<GetCharacterDataTransferObjects>>> GetAllCharacters()
         {
             var serviceResponse = new ServiceResponse<List<GetCharacterDataTransferObjects>>();
-            serviceResponse.Data = characters.Select(c => _mapper.Map<GetCharacterDataTransferObjects>(c)).ToList();
+            var dbCharacters = await _context.Characters.ToListAsync();
+            serviceResponse.Data = dbCharacters.Select(c => _mapper.Map<GetCharacterDataTransferObjects>(c)).ToList();
             return serviceResponse;
         }
 
         public async Task<ServiceResponse<GetCharacterDataTransferObjects>> GetCharacterById(int id)
         {
             var serviceResponse = new ServiceResponse<GetCharacterDataTransferObjects>();
-            var character = characters.FirstOrDefault(x => x.Id == id);
-            serviceResponse.Data = _mapper.Map<GetCharacterDataTransferObjects>(character);
+            var dbCharacters = await _context.Characters.FirstOrDefaultAsync(x => x.Id == id);
+            serviceResponse.Data = _mapper.Map<GetCharacterDataTransferObjects>(dbCharacters);
             return serviceResponse;
         }
 
