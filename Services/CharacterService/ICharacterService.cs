@@ -5,7 +5,7 @@ namespace MessingAroundWithDotNet.Services.CharacterService
 {
     public interface ICharacterService
     {
-        Task<ServiceResponse<List<GetCharacterDataTransferObjects>>> GetAllCharacters();
+        Task<ServiceResponse<List<GetCharacterDataTransferObjects>>> GetAllCharacters(int userId);
         Task<ServiceResponse<GetCharacterDataTransferObjects>> GetCharacterById(int id);
         Task<ServiceResponse<List<GetCharacterDataTransferObjects>>> AddCharacter(AddCharacterDataTransferObjects newCharacter);
         Task<ServiceResponse<GetCharacterDataTransferObjects>> UpdateCharacter(UpdateCharacterDataTransferObjects updatedCharacter);
