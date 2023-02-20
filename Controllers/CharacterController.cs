@@ -5,10 +5,12 @@ using System.Threading.Tasks;
 using MessingAroundWithDotNet.DataTransferObjects.Character;
 using MessingAroundWithDotNet.Models;
 using MessingAroundWithDotNet.Services.CharacterService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MessingAroundWithDotNet.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class CharacterController : ControllerBase
@@ -21,7 +23,6 @@ namespace MessingAroundWithDotNet.Controllers
         {
             _characterService = characterService;
         }
-
 
         [HttpGet("GetAll")]
         public async Task<ActionResult<ServiceResponse<List<GetCharacterDataTransferObjects>>>> Get()
