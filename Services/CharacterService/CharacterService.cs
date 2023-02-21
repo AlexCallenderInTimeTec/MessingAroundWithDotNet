@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
 using MessingAroundWithDotNet.Data;
@@ -14,23 +15,32 @@ namespace MessingAroundWithDotNet.Services.CharacterService
     {
         private readonly IMapper _mapper;
         private readonly DataContext _context;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public CharacterService(IMapper mapper, DataContext context)
+        public CharacterService(IMapper mapper, DataContext context, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
+            _httpContextAccessor = httpContextAccessor;
             _mapper = mapper;
             
         }
+
+        private int GetUserId() => int.Parse(_httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
         public async Task<ServiceResponse<List<GetCharacterDataTransferObjects>>> AddCharacter(AddCharacterDataTransferObjects newCharacter)
         {
             var serviceResponse = new ServiceResponse<List<GetCharacterDataTransferObjects>>();
             var character = _mapper.Map<Character>(newCharacter);
+            character.User = await _context.Users.FirstOrDefaultAsync(U => U.Id == GetUserId());
+
             _context.Characters.Add(character);
             await _context.SaveChangesAsync();
 
             serviceResponse.Data = 
-               await _context.Characters.Select(c => _mapper.Map<GetCharacterDataTransferObjects>(c)).ToListAsync();
+               await _context.Characters
+                    .Where(c => c.User!.Id == GetUserId())
+                    .Select(c => _mapper.Map<GetCharacterDataTransferObjects>(c))
+                    .ToListAsync();
             return serviceResponse;
         }
 
@@ -40,8 +50,10 @@ namespace MessingAroundWithDotNet.Services.CharacterService
 
             try
             {
-                var character = await _context.Characters.FirstOrDefaultAsync(c => c.Id == id);
-                if (character == null)
+                var character = await _context.Characters
+                    .Include(c => c.User)
+                    .FirstOrDefaultAsync(c => c.Id == id && c.User!.Id == GetUserId());
+                if (character == null || character.User!.Id != GetUserId())
                     throw new Exception($"Character with Id '{id}' not found.");
 
                 _context.Remove(character);
@@ -49,8 +61,10 @@ namespace MessingAroundWithDotNet.Services.CharacterService
                 await _context.SaveChangesAsync();
 
                 serviceResponse.Data = 
-                    await _context.Characters.Select(c => _mapper.Map<GetCharacterDataTransferObjects>(c)).ToListAsync();
-
+                    await _context.Characters
+                        .Where(c => c.User!.Id == GetUserId())
+                        .Select(c => _mapper.Map<GetCharacterDataTransferObjects>(c))
+                        .ToListAsync();
             }
             catch (Exception e)
             {
@@ -60,10 +74,10 @@ namespace MessingAroundWithDotNet.Services.CharacterService
             return serviceResponse;
         }
 
-        public async Task<ServiceResponse<List<GetCharacterDataTransferObjects>>> GetAllCharacters(int userId)
+        public async Task<ServiceResponse<List<GetCharacterDataTransferObjects>>> GetAllCharacters()
         {
             var serviceResponse = new ServiceResponse<List<GetCharacterDataTransferObjects>>();
-            var dbCharacters = await _context.Characters.Where(c => c.User!.Id == userId).ToListAsync();
+            var dbCharacters = await _context.Characters.Where(c => c.User!.Id == GetUserId()).ToListAsync();
             serviceResponse.Data = dbCharacters.Select(c => _mapper.Map<GetCharacterDataTransferObjects>(c)).ToList();
             return serviceResponse;
         }
@@ -71,7 +85,7 @@ namespace MessingAroundWithDotNet.Services.CharacterService
         public async Task<ServiceResponse<GetCharacterDataTransferObjects>> GetCharacterById(int id)
         {
             var serviceResponse = new ServiceResponse<GetCharacterDataTransferObjects>();
-            var dbCharacters = await _context.Characters.FirstOrDefaultAsync(x => x.Id == id);
+            var dbCharacters = await _context.Characters.FirstOrDefaultAsync(x => x.Id == id && x.User!.Id == GetUserId());
             serviceResponse.Data = _mapper.Map<GetCharacterDataTransferObjects>(dbCharacters);
             return serviceResponse;
         }
